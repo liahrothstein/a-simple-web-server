@@ -6,6 +6,11 @@ class BookService {
         return books
     }
 
+    async getOneBook({ id }) {
+        const book = await Book.findById(id);
+        return book
+    }
+
     async addBook(book) {
         const addedBook = await Book.create(book);
         return addedBook
