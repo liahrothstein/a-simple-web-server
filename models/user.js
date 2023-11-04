@@ -6,7 +6,9 @@ const User = mongoose.Schema({
     firstName: { type: String },
     lastName: { type: String },
     phone: { type: String, unique: true },
-    email: { type: String, required: true, unique: true }
+    email: { type: String, required: true, unique: true },
+    isActivated: { type: Boolean, default: false },
+    activationLink: { type: String }
 });
 
 export default mongoose.model('User', User)

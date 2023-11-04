@@ -1,37 +1,30 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from 'config';
-import { check, validationResult } from 'express-validator';
+import { v4 } from 'uuid';
 
 import User from '../models/user.js';
+import UserDto from '../dtos/user-dto.js';
+import TokenService from './token-service.js';
 
 class UserService {
-    async validationUser(req) {
-        const checkErrors = [
-            check('password', 'Invalid password').isLength({ min: 8 }),
-            check('phone', 'Invalid phone').isMobilePhone(['be-BY', 'ru-RU']),
-            check('email', 'Invalid email').isEmail()
-        ];
-
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            throw new Error(errors)
-        }
-
-        return checkErrors
-    }
-
-    async addUser(user) {
+    async registerUser(user) {
         const { login, password, firstName, lastName, phone, email } = user;
-        const isNewUser = await User.findOne({ login, email });
-        if (!!isNewUser) {
+        const candidate = await User.findOne({ login, email });
+        if (candidate) {
             throw new Error(`400 User with username - ${login}, already exist`)
         };
 
         const hashPassword = await bcrypt.hash(password, 7);
-        const addedUser = await User.create({ login, password: hashPassword, firstName, lastName, phone, email });
+        const activationLink = v4();
 
-        return addedUser
+        const addedUser = await User.create({ login, password: hashPassword, firstName, lastName, phone, email, activationLink });
+
+        const userDto = new UserDto(addedUser);
+        const tokens = await TokenService.generateTokens({ ...userDto });
+        await TokenService.saveToken(userDto.id, tokens.refreshToken);
+
+        return { ...tokens, user: userDto }
     }
 
     async loginUser(authData) {
@@ -47,7 +40,7 @@ class UserService {
             throw new Error('Password isn\'t correct')
         }
 
-        const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '15m' });
         return ({
             token, user: {
                 id: user.id,
@@ -58,6 +51,14 @@ class UserService {
                 email: user.email
             }
         });
+    }
+
+    async logoutUser() {
+
+    }
+
+    async refresh() {
+
     }
 
     async getUsers() {
