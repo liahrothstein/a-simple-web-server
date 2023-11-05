@@ -6,13 +6,14 @@ import { v4 } from 'uuid';
 import User from '../models/user.js';
 import UserDto from '../dtos/user-dto.js';
 import TokenService from './token-service.js';
+import ApiError from '../exceptions/api-error.js';
 
 class UserService {
     async registerUser(user) {
         const { login, password, firstName, lastName, phone, email } = user;
         const candidate = await User.findOne({ login, email });
         if (candidate) {
-            throw new Error(`400 User with username - ${login}, already exist`)
+            throw ApiError.BadRequest(`400 User with username - ${login}, already exist`)
         };
 
         const hashPassword = await bcrypt.hash(password, 7);
@@ -32,12 +33,12 @@ class UserService {
         const secretKey = config.get('secretKey');
         const user = await User.findOne({ login });
         if (!user) {
-            throw new Error('404 User Not Found')
+            throw ApiError.BadRequest('404 User Not Found')
         }
 
         const passwordCompare = bcrypt.compareSync(password, user.password);
         if (!passwordCompare) {
-            throw new Error('Password isn\'t correct')
+            throw ApiError.BadRequest('Password isn\'t correct')
         }
 
         const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '15m' });

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
 import router from './routes/router.js';
+import errorMiddleware from './middlewares/error-middleware.js';
 
 const DB_URL = config.get('dbUrl');
 const PORT = process.env.PORT || config.get('serverPort');
@@ -14,6 +15,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use('/api', router);
+
+app.use(errorMiddleware)
 
 const startApp = async () => {
     try {
