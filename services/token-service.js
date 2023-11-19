@@ -19,9 +19,14 @@ class TokenService {
             TokenData.refreshToken = refreshToken;
             return TokenData.save()
         };
-        
+
         const token = await Token.create({ user: userId, refreshToken });
         return token
+    }
+
+    async deleteToken(refreshToken) {
+        const tokenData = await Token.findOneAndDelete(refreshToken);
+        return tokenData
     }
 }
 
