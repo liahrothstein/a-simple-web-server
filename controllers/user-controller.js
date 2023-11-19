@@ -23,6 +23,8 @@ class UserController {
     async loginUser(req, res, next) {
         try {
             const userAndToken = await UserService.loginUser(req.body);
+            const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+            res.cookie('refreshToken', userAndToken.refreshToken, { maxAge: thirtyDays, httpOnly: true, secure: true });
             res.status(200).json(userAndToken)
         } catch (e) {
             next(e)

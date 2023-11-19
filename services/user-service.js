@@ -1,6 +1,4 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import config from 'config';
 import { v4 } from 'uuid';
 
 import User from '../models/user.js';
@@ -30,7 +28,6 @@ class UserService {
 
     async loginUser(authData) {
         const { login, password } = authData;
-        const secretKey = config.get('secretKey');
         const user = await User.findOne({ login });
         if (!user) {
             throw ApiError.BadRequest('404 User Not Found')
@@ -41,17 +38,11 @@ class UserService {
             throw ApiError.BadRequest('Password isn\'t correct')
         }
 
-        const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '15m' });
-        return ({
-            token, user: {
-                id: user.id,
-                login: user.login,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                phone: user.phone,
-                email: user.email
-            }
-        });
+        const userDto = new UserDto(user);
+        const tokens = await TokenService.generateTokens({ ...userDto });
+        await TokenService.saveToken(userDto.id, tokens.refreshToken);
+
+        return { ...tokens, user: userDto }
     }
 
     async logoutUser() {
