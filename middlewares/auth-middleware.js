@@ -6,23 +6,23 @@ const authMiddleware = (req, res, next) => {
     try {
         const authorizationHeader = req.headers.authorization;
         if (!authorizationHeader) {
-            next(ApiError.UnauthorizedUser())
+            next(ApiError.Unauthorized())
         }
 
         const accessToken = authorizationHeader.split(' ')[1];
         if (!accessToken) {
-            next(ApiError.UnauthorizedUser())
+            next(ApiError.Unauthorized())
         }
 
         const userData = TokenService.validateAccessToken(accessToken);
         if (!userData) {
-            next(ApiError.UnauthorizedUser())
+            next(ApiError.Forbidden())
         }
 
         req.user = userData;
         next()
     } catch (e) {
-        next(ApiError.UnauthorizedUser())
+        next(ApiError.Forbidden())
     }
 }
 

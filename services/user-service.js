@@ -11,7 +11,7 @@ class UserService {
         const { login, password, firstName, lastName, phone, email } = user;
         const candidate = await User.findOne({ login, email });
         if (candidate) {
-            throw ApiError.BadRequest(`400 User with username - ${login}, already exist`)
+            throw ApiError.BadRequest(`User with username - ${login}, already exist`)
         };
 
         const hashPassword = await bcrypt.hash(password, 7);
@@ -30,7 +30,7 @@ class UserService {
         const { login, password } = authData;
         const user = await User.findOne({ login });
         if (!user) {
-            throw ApiError.BadRequest('404 User Not Found')
+            throw ApiError.NotFound('User Not Found')
         }
 
         const passwordCompare = bcrypt.compareSync(password, user.password);
@@ -52,13 +52,17 @@ class UserService {
 
     async refresh(refreshToken) {
         if (!refreshToken) {
-            throw ApiError.UnauthorizedUser()
+            throw ApiError.Unauthorized()
         }
 
         const userData = TokenService.validateRefreshToken(refreshToken);
+        if (!userData) {
+            throw ApiError.Forbidden()
+        }
+
         const tokenFromDB = await TokenService.findToken(refreshToken);
-        if (!userData || !tokenFromDB) {
-            throw ApiError.UnauthorizedUser()
+        if (!tokenFromDB) {
+            throw ApiError.Unauthorized()
         }
 
         const user = await User.findById(userData.id);
@@ -76,16 +80,28 @@ class UserService {
 
     async getOneUser({ id }) {
         const user = await User.findById(id);
+        if (!user) {
+            throw ApiError.NotFound('The user with this id was not found')
+        }
+
         return user
     }
 
     async updateUser(initialUser) {
         const updatedUser = await User.findByIdAndUpdate(initialUser._id, initialUser, { new: true });
+        if (!updatedUser) {
+            throw ApiError.NotFound('The user with this id was not found')
+        }
+
         return updatedUser
     }
 
     async deleteUser({ id }) {
         const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            throw ApiError.NotFound('The user with this id was not found')
+        }
+
         return user
     }
 }
