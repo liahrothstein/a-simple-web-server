@@ -1,15 +1,14 @@
 import jwt from 'jsonwebtoken';
-import config from 'config';
 
 import Token from '../models/token.js';
 
 class TokenService {
     async generateTokens(payload) {
-        const secretKey = config.get('secretKey');
-        const refreshKey = config.get('refreshKey');
+        const SECRET_KEY = process.env.SECRET_KEY;
+        const REFRESH_KEY = process.env.REFRESH_KEY;
 
-        const accessToken = jwt.sign(payload, secretKey, { expiresIn: '15m' });
-        const refreshToken = jwt.sign(payload, refreshKey, { expiresIn: '30d' });
+        const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: '15m' });
+        const refreshToken = jwt.sign(payload, REFRESH_KEY, { expiresIn: '30d' });
         return { accessToken, refreshToken }
     }
 
@@ -31,8 +30,8 @@ class TokenService {
 
     validateAccessToken(token) {
         try {
-            const accessSecretKey = config.get('secretKey');
-            const userData = jwt.verify(token, accessSecretKey);
+            const ACCESS_SECRET_KEY = process.env.SECRET_KEY;
+            const userData = jwt.verify(token, ACCESS_SECRET_KEY);
             return userData
         } catch (e) {
             return null
@@ -41,8 +40,8 @@ class TokenService {
 
     validateRefreshToken(token) {
         try {
-            const refreshSecretKey = config.get('refreshKey');
-            const userData = jwt.verify(token.refreshToken, refreshSecretKey);
+            const REFRESH_SECRET_KEY = process.env.REFRESH_KEY;
+            const userData = jwt.verify(token.refreshToken, REFRESH_SECRET_KEY);
             return userData
         } catch (e) {
             return null
