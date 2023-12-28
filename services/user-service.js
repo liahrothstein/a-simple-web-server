@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { v4 } from 'uuid';
 
-import User from '../models/user.js';
+import UserRepository from '../repositories/user.repository.js';
 import UserDto from '../dtos/user-dto.js';
 import TokenService from './token-service.js';
 import ApiError from '../exceptions/api-error.js';
@@ -9,7 +9,7 @@ import ApiError from '../exceptions/api-error.js';
 class UserService {
     async registerUser(user) {
         const { login, password, firstName, lastName, phone, email } = user;
-        const candidate = await User.findOne({ login, email });
+        const candidate = await UserRepository.findOneUser({ login, email });
         if (candidate) {
             throw ApiError.BadRequest(`User with username - ${login}, already exist`)
         };
@@ -17,7 +17,7 @@ class UserService {
         const hashPassword = await bcrypt.hash(password, 7);
         const activationLink = v4();
 
-        const addedUser = await User.create({ login, password: hashPassword, firstName, lastName, phone, email, activationLink });
+        const addedUser = await UserRepository.createUser({ login, password: hashPassword, firstName, lastName, phone, email, activationLink });
 
         const userDto = new UserDto(addedUser);
         const tokens = await TokenService.generateTokens({ ...userDto });
@@ -28,7 +28,7 @@ class UserService {
 
     async loginUser(authData) {
         const { login, password } = authData;
-        const user = await User.findOne({ login });
+        const user = await UserRepository.findOneUser({ login });
         if (!user) {
             throw ApiError.NotFound('User Not Found')
         }
@@ -65,7 +65,7 @@ class UserService {
             throw ApiError.Unauthorized()
         }
 
-        const user = await User.findById(userData.id);
+        const user = await UserRepository.findByIdUser(userData.id);
         const userDto = new UserDto(user);
         const tokens = await TokenService.generateTokens({ ...userDto });
         await TokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -74,12 +74,12 @@ class UserService {
     }
 
     async getUsers() {
-        const AllUsers = await User.find();
+        const AllUsers = await UserRepository.findUsers();
         return AllUsers
     }
 
     async getOneUser({ id }) {
-        const user = await User.findById(id);
+        const user = await UserRepository.findByIdUser(id);
         if (!user) {
             throw ApiError.NotFound('The user with this id was not found')
         }
@@ -88,7 +88,7 @@ class UserService {
     }
 
     async updateUser(initialUser) {
-        const updatedUser = await User.findByIdAndUpdate(initialUser._id, initialUser, { new: true });
+        const updatedUser = await UserRepository.findByIdAndUpdateUser(initialUser._id, initialUser, { new: true });
         if (!updatedUser) {
             throw ApiError.NotFound('The user with this id was not found')
         }
@@ -97,7 +97,7 @@ class UserService {
     }
 
     async deleteUser({ id }) {
-        const user = await User.findByIdAndDelete(id);
+        const user = await UserRepository.findByIdAndDeleteUser(id);
         if (!user) {
             throw ApiError.NotFound('The user with this id was not found')
         }
