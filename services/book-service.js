@@ -1,14 +1,14 @@
 import ApiError from "../exceptions/api-error.js";
-import Book from "../models/book.js";
+import BookRepository from "../repositories/book.repository.js";
 
 class BookService {
     async getBooks() {
-        const books = await Book.find()
+        const books = await BookRepository.findBooks()
         return books
     }
 
     async getOneBook({ id }) {
-        const book = await Book.findById(id);
+        const book = await BookRepository.findByIdBook(id);
         if (!book) {
             throw ApiError.NotFound('The book with this id was not found')
         }
@@ -17,17 +17,17 @@ class BookService {
     }
 
     async addBook(book) {
-        const potentialBook = await Book.findOne(book);
+        const potentialBook = await BookRepository.findOneBook(book);
         if (potentialBook) {
             throw ApiError.BadRequest('This book already exists')
         }
 
-        const addedBook = await Book.create(book);
+        const addedBook = await BookRepository.createBook(book);
         return addedBook
     }
 
     async updateBook(initialBook) {
-        const updatedBook = await Book.findByIdAndUpdate(initialBook._id, initialBook, { new: true });
+        const updatedBook = await BookRepository.findByIdAndUpdateBook(initialBook._id, initialBook, { new: true });
         if (!updatedBook) {
             throw ApiError.NotFound('The book with this id was not found');
         }
@@ -36,7 +36,7 @@ class BookService {
     }
 
     async deleteBook({ id }) {
-        const book = await Book.findByIdAndDelete(id);
+        const book = await BookRepository.findByIdAndDeleteBook(id);
         if (!book) {
             throw ApiError.NotFound('The book with this id was not found');
         }
