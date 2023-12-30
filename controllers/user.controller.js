@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 
-import UserService from "../services/user-service.js";
-import ApiError from "../exceptions/api-error.js";
+import UserService from "../services/user.service.js";
+import ApiError from "../exceptions/api.error.js";
 
 class UserController {
     async registerUser(req, res, next) {
@@ -14,7 +14,7 @@ class UserController {
             const user = await UserService.registerUser(req.body);
             const thirtyDays = 30 * 24 * 60 * 60 * 1000;
             res.cookie('refreshToken', user.refreshToken, { maxAge: thirtyDays, httpOnly: true, secure: true });
-            res.status(200).json(user)
+            res.status(201).json(user)
         } catch (e) {
             next(e)
         }

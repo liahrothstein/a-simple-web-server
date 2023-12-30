@@ -1,6 +1,0 @@
-{
-    "serverPort": 4000,
-    "dbUrl": "mongodb+srv://liahrothstein:rbP-rcQ-keq-Ld9@cluster0.fcufoma.mongodb.net/?retryWrites=true&w=majority",
-    "secretKey": "circledevs-library-key",
-    "refreshKey": "circledevs-top-secret-refresh-key"
-}

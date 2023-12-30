@@ -1,9 +1,9 @@
 import Router from 'express';
 
-import UserController from '../controllers/user-controller.js';
-import BookController from '../controllers/book-controller.js';
-import { registerValidation } from '../validation/register-validation.js';
-import authMiddleware from '../middlewares/auth-middleware.js';
+import UserController from '../controllers/user.controller.js';
+import BookController from '../controllers/book.controller.js';
+import { registerValidation } from '../validation/register.validation.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = new Router();
 
@@ -17,7 +17,7 @@ router.get('/user/:id', authMiddleware, UserController.getOneUser);
 router.put('/update-user', authMiddleware, UserController.updateUser);
 router.delete('/delete-user/:id', authMiddleware, UserController.deleteUser);
 
-// books endpoints
+// book endpoints
 router.get('/books', authMiddleware, BookController.getBooks);
 router.get('/book/:id', authMiddleware, BookController.getOneBook);
 router.post('/add-book', authMiddleware, BookController.addBook);

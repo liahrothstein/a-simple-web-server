@@ -1,14 +1,15 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import config from 'config';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 import router from './routes/router.js';
-import errorMiddleware from './middlewares/error-middleware.js';
+import errorMiddleware from './middlewares/error.middleware.js';
 
-const DB_URL = config.get('dbUrl');
-const PORT = process.env.PORT || config.get('serverPort');
+dotenv.config();
+const DB_URL = process.env.DB_URL;
+const PORT = process.env.PORT;
 const app = express();
 
 app.use(express.json());
