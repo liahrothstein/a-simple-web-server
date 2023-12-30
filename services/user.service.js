@@ -2,9 +2,9 @@ import bcrypt from 'bcryptjs';
 import { v4 } from 'uuid';
 
 import UserRepository from '../repositories/user.repository.js';
-import UserDto from '../dtos/user-dto.js';
-import TokenService from './token-service.js';
-import ApiError from '../exceptions/api-error.js';
+import UserDto from '../dtos/user.dto.js';
+import TokenService from './token.service.js';
+import ApiError from '../exceptions/api.error.js';
 
 class UserService {
     async registerUser(user) {

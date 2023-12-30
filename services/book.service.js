@@ -1,4 +1,4 @@
-import ApiError from "../exceptions/api-error.js";
+import ApiError from "../exceptions/api.error.js";
 import BookRepository from "../repositories/book.repository.js";
 
 class BookService {

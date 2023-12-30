@@ -5,7 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import router from './routes/router.js';
-import errorMiddleware from './middlewares/error-middleware.js';
+import errorMiddleware from './middlewares/error.middleware.js';
 
 dotenv.config();
 const DB_URL = process.env.DB_URL;

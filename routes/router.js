@@ -1,9 +1,9 @@
 import Router from 'express';
 
-import UserController from '../controllers/user-controller.js';
-import BookController from '../controllers/book-controller.js';
-import { registerValidation } from '../validation/register-validation.js';
-import authMiddleware from '../middlewares/auth-middleware.js';
+import UserController from '../controllers/user.controller.js';
+import BookController from '../controllers/book.controller.js';
+import { registerValidation } from '../validation/register.validation.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = new Router();
 
